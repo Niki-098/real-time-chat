@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const outgoingMessages_1 = require("./message/outgoingMessages");
+const outgoingMessages_1 = require("./messages/outgoingMessages");
 const websocket_1 = require("websocket");
 const http_1 = __importDefault(require("http"));
-const incomingMessages_1 = require("./message/incomingMessages");
+const incomingMessages_1 = require("./messages/incomingMessages");
 const UserManager_1 = require("./UserManager");
 const InMemoryStore_1 = require("./InMemoryStore");
 const server = http_1.default.createServer(function (request, response) {
@@ -37,9 +37,11 @@ wsServer.on('request', function (request) {
     var connection = request.accept('echo-protocol', request.origin);
     console.log((new Date()) + ' Connection accepted.');
     connection.on('message', function (message) {
+        console.log(message);
         //Todo add rate limiting logic here
         if (message.type === 'utf8') {
             try {
+                console.log("indie with  message" + message.utf8Data);
                 messageHandler(connection, JSON.parse(message.utf8Data));
             }
             catch (e) {
@@ -51,6 +53,7 @@ wsServer.on('request', function (request) {
     });
 });
 function messageHandler(ws, message) {
+    console.log("incoming message " + JSON.stringify(message));
     if (message.type == incomingMessages_1.SupportedMessage.JoinRoom) {
         const payload = message.payload;
         userManager.addUser(payload.name, payload.userId, payload.roomId, ws);

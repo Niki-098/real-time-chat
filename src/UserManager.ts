@@ -1,5 +1,5 @@
 import { connection } from "websocket";
-import { OutgoingMessage } from "./message/outgoingMessages";
+import { OutgoingMessage } from "./messages/outgoingMessages";
 
 interface User {
     name: string;
@@ -53,8 +53,8 @@ export class UserManager {
         }
 
        
-
         room.users.forEach(({conn}) => {
+            console.log("outgoing message " + JSON.stringify(message))
             conn.sendUTF(JSON.stringify(message))
         })
     }

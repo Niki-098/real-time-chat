@@ -1,7 +1,7 @@
-import { OutgoingMessage, SupportedMessage as OutgoingSupportedMessages } from "./message/outgoingMessages";
+import { OutgoingMessage, SupportedMessage as OutgoingSupportedMessages } from "./messages/outgoingMessages";
 import {server as WebSocketServer,connection} from "websocket"
 import http from 'http';
-import { IncomingMessage,InitMessageType, SupportedMessage, UpvoteMessageType, UserMessageType } from "./message/incomingMessages";
+import { IncomingMessage,InitMessageType, SupportedMessage, UpvoteMessageType, UserMessageType } from "./messages/incomingMessages";
 import { UserManager } from "./UserManager";
 import { InMemoryStore } from "./InMemoryStore";
 
@@ -29,6 +29,7 @@ function originIsAllowed(origin: string) {
 }
 
 wsServer.on('request', function(request) {
+    console.log("inside connect");
     if (!originIsAllowed(request.origin)) {
       // Make sure we only accept requests from an allowed origin
       request.reject();
@@ -39,9 +40,11 @@ wsServer.on('request', function(request) {
     var connection = request.accept('echo-protocol', request.origin);
     console.log((new Date()) + ' Connection accepted.');
     connection.on('message', function(message) {
+        console.log(message);
         //Todo add rate limiting logic here
         if (message.type === 'utf8') {
             try{
+                console.log("indie with  message" + message.utf8Data)
                 messageHandler(connection,JSON.parse(message.utf8Data));
             }catch(e){
 
@@ -56,7 +59,7 @@ wsServer.on('request', function(request) {
 });
 
 function messageHandler(ws: connection,message: IncomingMessage){
-
+    console.log("incoming message " + JSON.stringify(message))
     if (message.type == SupportedMessage.JoinRoom) {
         const payload = message.payload;
         userManager.addUser(payload.name,payload.userId,payload.roomId,ws)
